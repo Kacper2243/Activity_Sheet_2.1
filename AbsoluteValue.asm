@@ -1,39 +1,36 @@
-@R0      // Load x into D
-D=M      
-@R2      
-M=0      // Initialise R2 to 0 (assume x is non-negative)
-@R3      
-M=0      // Initialise R3 to 0 (assume |x| can be computed)
-
-@R0      
-D=M      // Load x into D
+@R0
+D=M
+@R1
+M=D
 @NEGATIVE
-D;JLT    // If x < 0, jump to NEGATIVE
-
-@R1      
-M=D      // Store x in R1 (x is non-negative, so |x| = x)
+D;JLT
+@R2
+M=0
 @END
-0;JMP    // Jump to END
+0;JMP
 
 (NEGATIVE)
-@R2      
-M=1      // Set R2 to 1 (x is negative)
-
-@R0      
-D=M      // Load x into D
-D=-D     // Compute -x
-@OVERFLOW
-D;JLT    // If -x < 0, jump to OVERFLOW
-
-@R1      
-M=D      // Store |x| = -x in R1
+@R2
+M=1
+@R0
+D=M
+@32768
+D=D+A
+@CANNOT_COMPUTE
+D;JEQ
+@R0
+D=-M
+@R1
+M=D
+@R3
+M=0
 @END
-0;JMP    // Jump to END
+0;JMP
 
-(OVERFLOW)
-@R3      
-M=1      // Set R3 to 1 (overflow occurred)
-@R1      
-M=@R0    // Store x in R1 (unchanged)
+(CANNOT_COMPUTE)
+@R3
+M=1
+@END
+0;JMP
 
 (END)
